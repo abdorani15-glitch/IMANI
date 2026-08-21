@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IM Store | Only Admin Product Manager</title>
+<link rel="preconnect" href="https://googleapis.com">
+<link href="https://googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F4E9DC;
+    --cream-deep:#EBDAC5;
+    --card:#FBF5EC;
+    --ink:#221C16;
+    --taupe:#5B4A3B;
+    --taupe-light:#8A7563;
+    --gold:#AD8A54;
+    --white:#FFFDFB;
+    --line:#DBC9AF;
+    --shadow:0 10px 30px rgba(34,28,22,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Jost', sans-serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Cormorant Garamond', serif; font-weight:700; }
+  img{max-width:100%; display:block;}
+  button{font-family:inherit; cursor:pointer; border:none;}
+  input, textarea, select{font-family:inherit; width:100%; padding:12px; border-radius:8px; border:1px solid var(--line); background:var(--white); outline:none; font-size:0.95rem;}
+  input:focus, textarea:focus, select:focus{border-color:var(--gold);}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 22px;
+    background:rgba(244,233,220,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand-mini{display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; cursor:pointer;}
+  .brand-mini .logo-box{
+    font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1.5rem;
+    border:2px solid var(--ink); padding:0px 8px; line-height:1.1; letter-spacing:1px;
+  }
+  .brand-mini span{font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1.15rem; letter-spacing:1px;}
+  .top-actions{display:flex; gap:10px;}
+  .icon-btn{
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+    color:var(--taupe); transition:.2s; font-weight:bold;
+  }
+  .icon-btn:hover{background:var(--taupe); color:var(--white);}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; text-align:center; padding:64px 20px 46px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 0%, var(--cream-deep), transparent 60%);
+    z-index:0;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .logo-mark{
+    font-family:'Cormorant Garamond', serif; font-weight:700; font-size:3.5rem;
+    border:3px solid var(--ink); width:90px; height:90px; margin:0 auto 12px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .store-name{
+    font-family:'Cormorant Garamond', serif; font-weight:700;
+    font-size:2.8rem; color:var(--taupe); letter-spacing:3px;
+  }
+  .tagline{
+    font-size:1rem; color:var(--taupe-light); margin-top:10px;
+    font-weight:400; letter-spacing:.5px;
+  }
+  .divider-leaf{width:120px; height:1px; background:var(--line); margin:22px auto;}
+  .hero-cta{
+    margin-top:8px; display:inline-block; padding:13px 34px;
+    background:var(--taupe); color:var(--white); border-radius:999px;
+    font-weight:600; letter-spacing:1px; font-size:.9rem; text-transform:uppercase;
+    box-shadow:var(--shadow); transition:.2s; text-decoration:none;
+  }
+  .hero-cta:hover{background:var(--ink);}
+
+  /* ---------- Products Grid ---------- */
+  .section-title{
+    text-align:center; font-size:1.7rem; color:var(--ink);
+    margin:44px 0 26px; letter-spacing:.5px;
+  }
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:22px; max-width:1200px; margin:0 auto; padding:0 20px 60px;
+  }
+  .card{
+    background:var(--card); border-radius:16px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:var(--shadow);
+    display:flex; flex-direction:column; transition:transform .25s;
+  }
+  .card:hover{transform:translateY(-4px);}
+  
+  /* Slideshow Inside Card */
+  .card-img{
+    position:relative;
+    width:100%; aspect-ratio:3/4; background:var(--cream-deep);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .card-img img {
+    width:100%; height:100%; object-fit:cover; position:absolute; inset:0;
+    opacity:0; transition:opacity 0.5s ease-in-out;
+  }
+  .card-img img.active-slide { opacity:1; z-index:1; }
+  
+  .card-img-dots{
+    position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+    display:flex; gap:6px; z-index:5;
+  }
+  .card-img-dots span{
+    width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.4); transition:.2s;
+  }
+  .card-img-dots span.active{background:var(--white); width:14px; border-radius:3px;}
+
+  .card-body{padding:16px; display:flex; flex-direction:column; gap:8px; flex:1;}
+  .card-name{font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1.3rem; color:var(--ink); min-height:38px;}
+  .card-desc{font-size:.85rem; color:var(--taupe-light); flex:1;}
+  .card-price{font-family:'Cormorant Garamond', serif; font-weight:700; color:var(--taupe); font-size:1.35rem;}
+  
+  .order-btn{
+    margin-top:4px; padding:12px; border-radius:10px; background:#25D366;
+    color:#fff; font-weight:600; font-size:.85rem; display:flex;
+    align-items:center; justify-content:center; gap:8px; transition: 0.2s;
+    text-decoration: none;
+  }
+  .order-btn:hover{background:#1eb857;}
+
+  .empty-state{
+    grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--taupe-light);
+  }
+
+  /* ---------- Admin Modals & Panels ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(34,28,22,.65); z-index:100;
+    display:none; align-items:center; justify-content:center; backdrop-filter: blur(4px);
+    padding: 20px;
+  }
+  .overlay.show{display:flex;}
+  .panel{
+    background:var(--card); width:100%; max-width:600px; max-height:85vh;
+    overflow-y:auto; border-radius:20px; padding:26px 24px 34px;
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+    animation:slideUp .25s ease-out;
+  }
+  @keyframes slideUp{from{transform:translateY(40px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  
+  .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:12px;}
+  .panel-head h2 { font-size:1.8rem; color:var(--taupe); }
+  .close-btn{ background:none; font-size:1.8rem; color:var(--taupe-light); width:30px; height:30px; display:flex; align-items:center; justify-content:center; }
+  
+  .admin-box { background: var(--white); border: 1px solid var(--line); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+  .admin-box h3 { margin-bottom:16px; font-size:1.2rem; color: var(--taupe); border-left: 3px solid var(--gold); padding-left: 8px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display:block; font-size:0.8rem; font-weight:600; text-transform:uppercase; margin-bottom:6px; color:var(--taupe-light); }
+  .form-group input[type="file"] { background:transparent; border:none; padding:0; cursor:pointer; margin-bottom:6px; }
+  
+  .primary-btn { width:100%; padding:14px; background:var(--taupe); color:var(--white); font-weight:600; text-transform:uppercase; font-size:0.85rem; letter-spacing:1px; border-radius:8px; transition:.2s; }
+  .primary-btn:hover { background:var(--ink); }
+
+  /* Management Tables */
+  .table-wrapper { overflow-x: auto; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; text-align:left; }
+  th, td { padding:12px; border-bottom:1px solid var(--line); }
+  th { background:var(--cream); color:var(--taupe); font-weight:700; }
+  .del-btn { background:#ff4d4d; color:#fff; padding:6px 12px; border-radius:6px; font-size:0.75rem; font-weight:600; }
+  .del-btn:hover { background:#cc0000; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--ink); color:var(--cream-deep); text-align:center;
+    padding:40px 20px 30px; margin-top:40px; border-top:1px solid var(--line);
+  }
+  footer p{font-size:.82rem; opacity:.75; letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+  <!-- شريط التنقل العلوي -->
+  <header class="topbar">
+    <div class="brand-mini">
+      <div class="logo-box">IM</div>
+      <span>STUDIO</span>
+    </div>
+    <div class="top-actions">
+      <!-- زر سري مخصص لك فقط للدخول للوحة التحكم -->
+      <button class="icon-btn" onclick="openSecurityAccessGate()" title="Admin HQ">⚙️ Admin Login</button>
+    </div>
+  </header>
+
+  <!-- القسم الترحيبي للمتجر -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="logo-mark">IM</div>
+      <h1 class="store-name">IM COLLECTION</h1>
+      <p class="tagline">Exclusive Apparel. Curated and managed only by the creator.</p>
+      <div class="divider-leaf"></div>
+    </div>
+  </section>
+
+  <!-- المعرض العام للمنتجات للجمهور -->
+  <h2 class="section-title">The Showroom</h2>
+  <main class="grid" id="publicProductsShowcaseGrid"></main>
+
+  <!-- نافذة 1: بوابة تسجيل الدخول المخصصة لك -->
+  <div class="overlay" id="securityAuthGateModal">
+    <div class="panel" style="max-width:400px;">
+      <div class="panel-head">
+        <h2>Admin Identity</h2>
+        <button class="close-btn" onclick="closeModal('securityAuthGateModal')">×</button>
+      </div>
+      <div class="form-group">
+        <label for="masterVaultPassword">Enter Admin Password:</label>
+        <input type="password" id="masterVaultPassword" placeholder="••••••••" style="text-align:center; font-size:1.2rem; letter-spacing:4px;">
+      </div>
+      <button class="primary-btn" onclick="verifyAdminPasswordToken()">Access Control Dashboard</button>
+    </div>
+  </div>
